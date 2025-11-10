@@ -5,17 +5,18 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>迷路救援定位系統</title>
   <style>
-    body{font-family:"Noto Sans TC",system-ui,Segoe UI,Roboto,Arial; background: linear-gradient(180deg,#cdeac0 0%,#a8d5ba 100%); margin:0; color:#2f3e46; min-height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:space-between;}
+    body{font-family:"Noto Sans TC",system-ui,Segoe UI,Roboto,Arial; background: linear-gradient(180deg,#cdeac0 0%,#a8d5ba 100%); margin:0; color:#2f3e46; min-height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:flex-start;}
     header{padding-top:28px; text-align:center;}
     .logo{width:70px;height:70px;border-radius:50%;background:radial-gradient(circle at 30% 30%, #74c69d, #2d6a4f);display:inline-flex;align-items:center;justify-content:center;box-shadow:0 2px 6px rgba(0,0,0,0.2);margin-bottom:8px;}
     .logo::before{content:"🧭";font-size:2rem;color:#fff;}
     h1{margin:6px 0;font-size:1.6rem;}
     p.description{margin:0 20px;line-height:1.6;font-size:1rem;}
     main{width:100%;max-width:420px;padding:20px;box-sizing:border-box;}
-    button{display:block;width:100%;padding:14px 18px;margin:12px 0;border:none;border-radius:999px;background:linear-gradient(90deg,#52b788,#40916c);color:#fff;font-size:16px;cursor:pointer;box-shadow:0 3px 6px rgba(0,0,0,0.12);}
+    button{display:block;width:100%;padding:16px 18px;margin:12px 0;border:none;border-radius:999px;background:linear-gradient(90deg,#52b788,#40916c);color:#fff;font-size:18px;cursor:pointer;box-shadow:0 3px 6px rgba(0,0,0,0.12);}
     button:active{transform:translateY(1px);}
-    #mapLink{margin-top:10px;word-break:break-word;font-weight:600;color:#123e2b;}
-    .note{font-size:0.9rem;color:#2f3e46;margin-top:10px;}
+    #mapLink{margin-top:10px;word-break:break-word;font-weight:600;color:#123e2b;font-size:1rem;}
+    .note{font-size:0.95rem;color:#2f3e46;margin-top:10px;}
+    .step{background:rgba(255,255,255,0.6);padding:8px 12px;border-radius:12px;margin-bottom:6px;font-weight:600;}
     footer{font-size:0.85rem;padding:12px 8px;color:#495057;text-align:center;}
     a.button-link{text-decoration:none;}
   </style>
@@ -24,20 +25,25 @@
   <header>
     <div class="logo"></div>
     <h1>🧭 迷路救援定位系統</h1>
-    <p class="description">若你與隊伍走散，請先加入領隊好友，然後取得你的位置並發送給領隊。<br><br>📍 資料僅用於即時定位，不會被儲存。</p>
+    <p class="description">若你與隊伍走散，請依序操作：取得你的位置並發送給領隊。<br><br>📍 資料僅用於即時定位，不會被儲存。</p>
   </header>
 
   <main>
-    <a class="button-link" href="https://lin.ee/N3qZA4y" target="_blank"><button>➕ 加入領隊好友</button></a>
+    <div class="step">步驟1：加入領隊好友（確保可傳送訊息）</div>
+    <a class="button-link" href="https://lin.ee/N3qZA4y" target="_blank">
+      <button>➕ 加入領隊好友</button>
+    </a>
 
+    <div class="step">步驟2：取得你的現在位置</div>
     <button id="getBtn">📍 取得目前位置</button>
 
     <div id="mapLink"></div>
 
     <div id="actions" style="display:none;">
+      <div class="step">步驟3：發送你的現在位置給領隊</div>
       <button id="sendLineBtn">💬 發送現在位置</button>
       <button id="copyBtn">📋 複製定位連結</button>
-      <p class="note">若自動傳送失效，可手動截圖此頁面或複製連結並傳給領隊。</p>
+      <p class="note">若自動傳送失敗，可手動複製連結或截圖頁面傳給領隊。</p>
     </div>
   </main>
 
@@ -62,7 +68,7 @@
         const lat = pos.coords.latitude.toFixed(6);
         const lon = pos.coords.longitude.toFixed(6);
         mapUrl = `https://maps.google.com/?q=${lat},${lon}`;
-        mapLinkDiv.innerHTML = `📌 您的位置：<br><a href="${mapUrl}" target="_blank" rel="noopener">${mapUrl}</a>`;
+        mapLinkDiv.innerHTML = `✅ 定位成功！<br>📌 您的位置：<br><a href="${mapUrl}" target="_blank" rel="noopener">${mapUrl}</a>`;
         actions.style.display = 'block';
         getBtn.disabled = false;
         getBtn.textContent = '📍 取得目前位置';

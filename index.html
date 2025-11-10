@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>迷路救援定位系統</title>
+  <style>
+    body{font-family:"Noto Sans TC",system-ui,Segoe UI,Roboto,Arial; background: linear-gradient(180deg,#cdeac0 0%,#a8d5ba 100%); margin:0; color:#2f3e46; min-height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:space-between;}
+    header{padding-top:28px; text-align:center;}
+    .logo{width:70px;height:70px;border-radius:50%;background:radial-gradient(circle at 30% 30%, #74c69d, #2d6a4f);display:inline-flex;align-items:center;justify-content:center;box-shadow:0 2px 6px rgba(0,0,0,0.2);margin-bottom:8px;}
+    .logo::before{content:"🧭";font-size:2rem;color:#fff;}
+    h1{margin:6px 0;font-size:1.6rem;}
+    p.description{margin:0 20px;line-height:1.6;font-size:1rem;}
+    main{width:100%;max-width:420px;padding:20px;box-sizing:border-box;}
+    button{display:block;width:100%;padding:14px 18px;margin:12px 0;border:none;border-radius:999px;background:linear-gradient(90deg,#52b788,#40916c);color:#fff;font-size:16px;cursor:pointer;box-shadow:0 3px 6px rgba(0,0,0,0.12);}
+    button:active{transform:translateY(1px);}
+    #mapLink{margin-top:10px;word-break:break-word;font-weight:600;color:#123e2b;}
+    .note{font-size:0.9rem;color:#2f3e46;margin-top:10px;}
+    footer{font-size:0.85rem;padding:12px 8px;color:#495057;text-align:center;}
+    a.button-link{text-decoration:none;}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo"></div>
+    <h1>🧭 迷路救援定位系統</h1>
+    <p class="description">若你與隊伍走散，請先加入領隊好友，然後取得你的位置並發送給領隊。<br><br>📍 資料僅用於即時定位，不會被儲存。</p>
+  </header>
+
+  <main>
+    <a class="button-link" href="https://lin.ee/N3qZA4y" target="_blank"><button>➕ 加入領隊好友</button></a>
+
+    <button id="getBtn">📍 取得目前位置</button>
+
+    <div id="mapLink"></div>
+
+    <div id="actions" style="display:none;">
+      <button id="sendLineBtn">💬 發送現在位置</button>
+      <button id="copyBtn">📋 複製定位連結</button>
+      <p class="note">若自動傳送失效，可手動截圖此頁面或複製連結並傳給領隊。</p>
+    </div>
+  </main>
+
+  <footer>由領隊李長紘製作 | Powered by Netlify</footer>
+
+  <script>
+    let mapUrl = "";
+    const getBtn = document.getElementById('getBtn');
+    const sendLineBtn = document.getElementById('sendLineBtn');
+    const copyBtn = document.getElementById('copyBtn');
+    const actions = document.getElementById('actions');
+    const mapLinkDiv = document.getElementById('mapLink');
+
+    getBtn.addEventListener('click', () => {
+      if (!navigator.geolocation) {
+        alert('此裝置不支援定位功能。');
+        return;
+      }
+      getBtn.disabled = true;
+      getBtn.textContent = '⏳ 取得位置中...';
+      navigator.geolocation.getCurrentPosition(pos => {
+        const lat = pos.coords.latitude.toFixed(6);
+        const lon = pos.coords.longitude.toFixed(6);
+        mapUrl = `https://maps.google.com/?q=${lat},${lon}`;
+        mapLinkDiv.innerHTML = `📌 您的位置：<br><a href="${mapUrl}" target="_blank" rel="noopener">${mapUrl}</a>`;
+        actions.style.display = 'block';
+        getBtn.disabled = false;
+        getBtn.textContent = '📍 取得目前位置';
+        actions.scrollIntoView({behavior:'smooth', block:'center'});
+      }, err => {
+        getBtn.disabled = false;
+        getBtn.textContent = '📍 取得目前位置';
+        switch(err.code) {
+          case err.PERMISSION_DENIED:
+            alert('⚠️ 您拒絕了定位要求。請到瀏覽器設定打開定位權限。');
+            break;
+          case err.POSITION_UNAVAILABLE:
+            alert('⚠️ 無法取得定位資訊。');
+            break;
+          case err.TIMEOUT:
+            alert('⚠️ 定位逾時，請再試一次。');
+            break;
+          default:
+            alert('⚠️ 發生錯誤：' + err.message);
+        }
+      }, {enableHighAccuracy:true, timeout:15000, maximumAge:0});
+    });
+
+    sendLineBtn.addEventListener('click', () => {
+      if (!mapUrl) return alert('請先取得位置');
+      const message = encodeURIComponent(`我現在的位置：${mapUrl}`);
+      const composeUrl = `https://line.me/R/msg/text/?${message}`;
+      window.open(composeUrl, '_blank');
+    });
+
+    copyBtn.addEventListener('click', () => {
+      if (!mapUrl) return alert('請先取得位置');
+      navigator.clipboard.writeText(mapUrl).then(() => {
+        alert('📋 已複製定位連結，可貼上傳送給領隊。');
+      }).catch(() => {
+        alert('❌ 複製失敗，請長按連結手動複製。');
+      });
+    });
+  </script>
+</body>
+</html>
